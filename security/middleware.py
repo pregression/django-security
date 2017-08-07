@@ -50,7 +50,9 @@ class BaseMiddleware(MiddlewareMixin):
         ):
             self.load_setting(setting, value)
 
-    def __init__(self):
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+
         if not self.REQUIRED_SETTINGS and not self.OPTIONAL_SETTINGS:
             return
 
@@ -668,8 +670,9 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
         return '; '.join(csp_components)
 
-    def __init__(self):
+    def __init__(self, get_response=None):
         # sanity checks
+        self.get_response = get_response
         csp_mode = getattr(django.conf.settings, 'CSP_MODE', None)
         csp_string = getattr(django.conf.settings, 'CSP_STRING', None)
         csp_dict = getattr(django.conf.settings, 'CSP_DICT', None)
@@ -750,7 +753,9 @@ class StrictTransportSecurityMiddleware(MiddlewareMixin):
      <https://datatracker.ietf.org/doc/rfc6797/>`_
     - `Preloaded HSTS sites <http://www.chromium.org/sts>`_
     """
-    def __init__(self):
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+
         try:
             self.max_age = django.conf.settings.STS_MAX_AGE
         except AttributeError:
